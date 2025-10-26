@@ -93,3 +93,5 @@ export const categories = [
   { id: 'events', name: 'Events', count: portfolioData.filter(item => item.category === 'events').length },
   { id: 'nature', name: 'Nature', count: portfolioData.filter(item => item.category === 'nature').length }
 ];
+
+

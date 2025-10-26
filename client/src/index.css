@@ -299,3 +299,113 @@ h1, h2, h3, h4, h5, h6 {
 .glow-animation {
   animation: glow 3s ease-in-out infinite;
 }
+
+/* Dark Theme Utilities (hianime-like) */
+.dark-bg {
+  background-color: #0b0b0f; /* near-black */
+  color: #e5e7eb; /* gray-200 */
+}
+.dark-section {
+  background: linear-gradient(180deg, rgba(11,11,15,1) 0%, rgba(15,15,19,1) 100%);
+}
+.text-dim {
+  color: #9ca3af; /* gray-400 */
+}
+.border-dark-soft {
+  border-color: rgba(255,255,255,0.08);
+}
+
+/* Anime-style Cards */
+.anime-card {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #111318;
+  border: 1px solid rgba(255,255,255,0.08);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.anime-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(212,175,55,0.35);
+  box-shadow: 0 12px 35px rgba(0,0,0,0.45);
+}
+.anime-card img {
+  display: block;
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+.anime-card-body {
+  padding: 0.75rem 0.875rem 1rem;
+}
+.anime-card-title {
+  font-family: var(--font-family-serif);
+  font-size: 1rem;
+  color: #f3f4f6; /* gray-100 */
+  margin-bottom: 0.25rem;
+}
+.anime-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: #9ca3af; /* gray-400 */
+}
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  line-height: 1;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  color: #e5e7eb;
+}
+.badge-gold {
+  border-color: rgba(212,175,55,0.5);
+  background: rgba(212,175,55,0.12);
+  color: var(--color-gold);
+}
+.badge-new {
+  border-color: rgba(16,185,129,0.45);
+  background: rgba(16,185,129,0.12);
+  color: #34d399;
+}
+
+/* Tabs (pills) */
+.pill-tabs {
+  display: inline-flex;
+  gap: 8px;
+  padding: 6px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.pill-tab {
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  border-radius: 999px;
+  color: #cbd5e1; /* slate-300 */
+  transition: all 0.2s ease;
+}
+.pill-tab:hover { color: #f3f4f6; }
+.pill-tab.active {
+  background: rgba(212,175,55,0.18);
+  color: var(--color-gold);
+  border: 1px solid rgba(212,175,55,0.4);
+}
+
+/* Section headings (dark) */
+.section-heading-dark {
+  font-family: var(--font-family-serif);
+  font-size: 2rem;
+  color: #f9fafb;
+}
+.section-subheading-dark {
+  color: #9ca3af;
+}
