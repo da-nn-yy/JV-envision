@@ -1,4 +1,13 @@
-// Local hero images
+/**
+ * Hero Carousel Data Configuration
+ *
+ * This module exports the hero carousel data for JV Envision Photography.
+ * Each item includes optimized metadata for SEO, accessibility, and performance.
+ *
+ * @module heroCarousel
+ */
+
+// Local hero images - optimized imports
 import img1 from '../assets/461536396_939926458181536_7671039877354462553_n.jpg';
 import img2 from '../assets/461604277_939926484848200_7841378582899541348_n.jpg';
 import img3 from '../assets/461724997_939926404848208_1948535839748304294_n.jpg';
@@ -6,48 +15,75 @@ import img4 from '../assets/461768881_939926504848198_1174208919682756014_n.jpg'
 import img5 from '../assets/461774174_939926364848212_5235190980017089231_n.jpg';
 import img6 from '../assets/462125915_988534479951844_4076670015032483735_n.jpg';
 
-// Hero carousel data for JV Envision Photography
+/**
+ * Hero carousel data for JV Envision Photography
+ *
+ * @type {Array<Object>}
+ * @property {number} id - Unique identifier for each carousel item
+ * @property {string} image - Imported image asset
+ * @property {string} title - Main heading for the carousel slide
+ * @property {string} subtitle - Supporting text describing the service
+ * @property {string} alt - Accessible alt text for screen readers
+ * @property {string} description - Extended description for SEO (optional)
+ */
 export const heroCarouselData = [
   {
     id: 1,
     image: img1,
     title: 'Elegant Wedding Photography',
     subtitle: 'Capturing your special day with artistic vision',
-    alt: 'Elegant wedding moment'
+    alt: 'Elegant wedding moment captured by JV Envision Photography',
+    description: 'Professional wedding photography services that capture the essence of your special day with artistic vision and attention to detail.'
   },
   {
     id: 2,
     image: img2,
     title: 'Family Portrait Sessions',
     subtitle: 'Timeless memories for generations to come',
-    alt: 'Family portrait outdoors'
+    alt: 'Family portrait session outdoors by JV Envision Photography',
+    description: 'Create lasting family memories with our professional portrait sessions, designed to capture the love and connection between family members.'
   },
   {
     id: 3,
     image: img3,
     title: 'Destination Weddings',
     subtitle: 'Adventure and romance captured beautifully',
-    alt: 'Destination wedding scene'
+    alt: 'Destination wedding photography by JV Envision Photography',
+    description: 'Travel with us to capture your destination wedding, combining adventure and romance in stunning locations around the world.'
   },
   {
     id: 4,
     image: img4,
     title: 'Senior Portrait Photography',
     subtitle: 'Celebrating life\'s milestones with style',
-    alt: 'Senior portrait session'
+    alt: 'Senior portrait photography session by JV Envision Photography',
+    description: 'Celebrate your high school graduation with a professional senior portrait session that reflects your unique personality and style.'
   },
   {
     id: 5,
     image: img5,
     title: 'Maternity Photography',
     subtitle: 'The beauty of new life and love',
-    alt: 'Maternity photography session'
+    alt: 'Maternity photography session capturing the beauty of pregnancy',
+    description: 'Capture the beautiful journey of pregnancy with our intimate maternity photography sessions that celebrate the miracle of new life.'
   },
   {
     id: 6,
     image: img6,
     title: 'Event Photography',
     subtitle: 'Documenting life\'s celebrations',
-    alt: 'Event and celebration photo'
+    alt: 'Event and celebration photography by JV Envision Photography',
+    description: 'Professional event photography services to document your special celebrations, from corporate events to milestone parties.'
   }
 ];
+
+/**
+ * Default configuration for the hero carousel
+ */
+export const carouselConfig = {
+  autoSlideInterval: 6000, // 6 seconds
+  transitionDuration: 800, // milliseconds
+  pauseOnHover: true,
+  pauseOnInteraction: true,
+  resumeAfterPause: 10000 // 10 seconds
+};

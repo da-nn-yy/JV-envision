@@ -1,79 +1,235 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-// eslint-disable-next-line no-unused-vars
-import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Sparkles, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
+import { Camera, Sparkles, Heart, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
+import { heroCarouselData, carouselConfig } from '../data/heroCarousel';
 
-// Local fallback images
-import img1 from '../assets/461536396_939926458181536_7671039877354462553_n.jpg';
-import img2 from '../assets/461604277_939926484848200_7841378582899541348_n.jpg';
-import img3 from '../assets/461724997_939926404848208_1948535839748304294_n.jpg';
-import img4 from '../assets/461768881_939926504848198_1174208919682756014_n.jpg';
-import img5 from '../assets/461774174_939926364848212_5235190980017089231_n.jpg';
-import img6 from '../assets/462125915_988534479951844_4076670015032483735_n.jpg';
+/**
+ * HeroCarousel Component
+ *
+ * A modern, accessible, and performant hero carousel with:
+ * - Keyboard navigation (Arrow keys, Space, Enter)
+ * - Touch/swipe support for mobile
+ * - Image preloading for smooth transitions
+ * - Smooth animations with Framer Motion
+ * - Full accessibility support (ARIA labels, focus management)
+ * - Auto-play with pause on hover/interaction
+ *
+ * @param {Object} props
+ * @param {Array} props.images - Array of image objects (defaults to heroCarouselData)
+ * @param {number} props.autoSlideInterval - Auto-slide interval in ms (defaults to carouselConfig)
+ */
+const HeroCarousel = ({
+  images = heroCarouselData,
+  autoSlideInterval = carouselConfig.autoSlideInterval
+}) => {
+  // Validate and ensure images array is not empty
+  const validImages = Array.isArray(images) && images.length > 0 ? images : heroCarouselData;
 
-const HeroCarousel = ({ autoSlideInterval = 5000 }) => {
-  const defaultImages = [
-    { id: 1, image: img1, title: 'Elegant Wedding Photography', subtitle: 'Capturing your special day with artistic vision', alt: 'Elegant wedding moment' },
-    { id: 2, image: img2, title: 'Family Portrait Sessions', subtitle: 'Timeless memories for generations to come', alt: 'Family portrait outdoors' },
-    { id: 3, image: img3, title: 'Destination Weddings', subtitle: 'Adventure and romance captured beautifully', alt: 'Destination wedding scene' },
-    { id: 4, image: img4, title: 'Senior Portrait Photography', subtitle: "Celebrating life's milestones with style", alt: 'Senior portrait session' },
-    { id: 5, image: img5, title: 'Maternity Photography', subtitle: 'The beauty of new life and love', alt: 'Maternity photography session' },
-    { id: 6, image: img6, title: 'Event Photography', subtitle: "Documenting life's celebrations", alt: 'Event and celebration photo' }
-  ];
-
-  const images = defaultImages; // Force local images to ensure visibility
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
   const [direction, setDirection] = useState(1); // 1 for next/right, -1 for prev/left
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+  const [loadedImages, setLoadedImages] = useState(new Set());
+  const carouselRef = useRef(null);
+  const resumeTimeoutRef = useRef(null);
 
-  const slideVariants = {
-    enter: { opacity: 0 },
-    center: { opacity: 1 },
-    exit: { opacity: 0 }
-  };
+  // Minimum swipe distance (in px)
+  const minSwipeDistance = 50;
 
-  // Auto-slide functionality
+  // Ensure currentIndex is within bounds
   useEffect(() => {
-    if (!isAutoPlaying) return;
+    if (currentIndex >= validImages.length) {
+      setCurrentIndex(0);
+    }
+  }, [currentIndex, validImages.length]);
+
+  // Preload images for smooth transitions
+  useEffect(() => {
+    const preloadImages = () => {
+      validImages.forEach((item, index) => {
+        if (item?.image) {
+          const img = new Image();
+          img.src = typeof item.image === 'string' ? item.image : item.image.src || item.image;
+          img.onload = () => {
+            setLoadedImages(prev => new Set([...prev, index]));
+          };
+          img.onerror = () => {
+            console.warn(`Failed to load image at index ${index}`);
+          };
+        }
+      });
+    };
+    preloadImages();
+  }, [validImages]);
+
+  // Auto-slide functionality with proper cleanup
+  useEffect(() => {
+    if (!isAutoPlaying || isPaused) return;
 
     const interval = setInterval(() => {
       setDirection(1);
       setCurrentIndex((prevIndex) =>
-        prevIndex === images.length - 1 ? 0 : prevIndex + 1
+        prevIndex === validImages.length - 1 ? 0 : prevIndex + 1
       );
     }, autoSlideInterval);
 
     return () => clearInterval(interval);
-  }, [images.length, autoSlideInterval, isAutoPlaying]);
+  }, [validImages.length, autoSlideInterval, isAutoPlaying, isPaused]);
 
-  const goToSlide = (index) => {
+  // Pause auto-play temporarily after user interaction
+  const pauseAutoPlay = useCallback(() => {
+    setIsAutoPlaying(false);
+    setIsPaused(true);
+
+    // Clear any existing timeout
+    if (resumeTimeoutRef.current) {
+      clearTimeout(resumeTimeoutRef.current);
+    }
+
+    // Resume auto-play after configured delay
+    resumeTimeoutRef.current = setTimeout(() => {
+      setIsAutoPlaying(true);
+      setIsPaused(false);
+    }, carouselConfig.resumeAfterPause);
+  }, []);
+
+  // Navigation functions
+  const goToSlide = useCallback((index) => {
+    if (index === currentIndex || index < 0 || index >= validImages.length) return;
+
     setDirection(index > currentIndex ? 1 : -1);
     setCurrentIndex(index);
-    setIsAutoPlaying(false);
-    // Resume auto-play after 10 seconds
-    setTimeout(() => setIsAutoPlaying(true), 10000);
-  };
+    pauseAutoPlay();
+  }, [currentIndex, validImages.length, pauseAutoPlay]);
 
-  const goToPrevious = () => {
+  const goToPrevious = useCallback(() => {
     setDirection(-1);
-    setCurrentIndex(currentIndex === 0 ? images.length - 1 : currentIndex - 1);
-    setIsAutoPlaying(false);
-    setTimeout(() => setIsAutoPlaying(true), 10000);
+    setCurrentIndex((prev) => (prev === 0 ? validImages.length - 1 : prev - 1));
+    pauseAutoPlay();
+  }, [validImages.length, pauseAutoPlay]);
+
+  const goToNext = useCallback(() => {
+    setDirection(1);
+    setCurrentIndex((prev) => (prev === validImages.length - 1 ? 0 : prev + 1));
+    pauseAutoPlay();
+  }, [validImages.length, pauseAutoPlay]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!carouselRef.current?.contains(document.activeElement) &&
+          document.activeElement !== document.body) {
+        return;
+      }
+
+      switch (e.key) {
+        case 'ArrowLeft':
+          e.preventDefault();
+          goToPrevious();
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          goToNext();
+          break;
+        case ' ':
+        case 'Enter':
+          e.preventDefault();
+          if (e.key === ' ' || e.key === 'Enter') {
+            goToNext();
+          }
+          break;
+        case 'Home':
+          e.preventDefault();
+          goToSlide(0);
+          break;
+        case 'End':
+          e.preventDefault();
+          goToSlide(validImages.length - 1);
+          break;
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [goToPrevious, goToNext, goToSlide, validImages.length]);
+
+  // Touch handlers for mobile swipe
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
   };
 
-  const goToNext = () => {
-    setDirection(1);
-    setCurrentIndex(currentIndex === images.length - 1 ? 0 : currentIndex + 1);
-    setIsAutoPlaying(false);
-    setTimeout(() => setIsAutoPlaying(true), 10000);
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
   };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      goToNext();
+    } else if (isRightSwipe) {
+      goToPrevious();
+    }
+  };
+
+  // Enhanced slide variants with direction-aware animations
+  const slideVariants = {
+    enter: (direction) => ({
+      opacity: 0,
+      x: direction > 0 ? 100 : -100,
+      scale: 0.95
+    }),
+    center: {
+      opacity: 1,
+      x: 0,
+      scale: 1
+    },
+    exit: (direction) => ({
+      opacity: 0,
+      x: direction > 0 ? -100 : 100,
+      scale: 0.95
+    })
+  };
+
+  // Get current image data safely
+  const currentImage = validImages[currentIndex] || validImages[0];
+  const imageSrc = currentImage?.image?.src || currentImage?.image || '';
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (resumeTimeoutRef.current) {
+        clearTimeout(resumeTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
-    <section className="relative flex items-center justify-start min-h-screen overflow-hidden">
+    <section
+      ref={carouselRef}
+      className="relative flex items-center justify-start min-h-screen overflow-hidden"
+      role="region"
+      aria-label="Hero carousel"
+      aria-roledescription="carousel"
+      onMouseEnter={() => carouselConfig.pauseOnHover && setIsPaused(true)}
+      onMouseLeave={() => carouselConfig.pauseOnHover && setIsPaused(false)}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
       {/* Background Images */}
       <div className="absolute inset-0">
-        <AnimatePresence initial={false} custom={direction}>
+        <AnimatePresence initial={false} custom={direction} mode="wait">
           <motion.div
             key={currentIndex}
             custom={direction}
@@ -81,24 +237,38 @@ const HeroCarousel = ({ autoSlideInterval = 5000 }) => {
             initial="enter"
             animate="center"
             exit="exit"
-            transition={{ duration: 0.8, ease: "easeInOut" }}
+            transition={{
+              duration: carouselConfig.transitionDuration / 1000,
+              ease: [0.25, 0.1, 0.25, 1] // Custom easing for smoother animation
+            }}
             className="absolute inset-0"
           >
             <img
-              src={images?.[currentIndex]?.image || 'https://via.placeholder.com/2560x1440?text=Image+unavailable'}
-              alt={images?.[currentIndex]?.alt || 'Hero image'}
+              src={imageSrc}
+              alt={currentImage?.alt || `Hero image ${currentIndex + 1}`}
               decoding="async"
-              loading="eager"
+              loading={currentIndex === 0 ? "eager" : "lazy"}
               className="absolute inset-0 z-0 w-full h-full object-cover"
+              style={{
+                filter: loadedImages.has(currentIndex) ? 'none' : 'blur(10px)',
+                transition: 'filter 0.3s ease-in-out'
+              }}
             />
-            {/* Gradient overlay (hianime-like) */}
-            <div className="absolute inset-0 z-10 bg-gradient-to-r from-black/70 via-black/30 to-transparent"></div>
+            {/* Enhanced gradient overlay */}
+            <div className="absolute inset-0 z-10 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
+            {/* Subtle vignette effect */}
+            <div
+              className="absolute inset-0 z-10"
+              style={{
+                background: 'radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.2) 100%)'
+              }}
+            ></div>
           </motion.div>
         </AnimatePresence>
       </div>
 
-      {/* Floating Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {/* Floating Decorative Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
         <motion.div
           animate={{
             x: [0, 100, 0],
@@ -107,6 +277,7 @@ const HeroCarousel = ({ autoSlideInterval = 5000 }) => {
           }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
           className="absolute w-20 h-20 top-20 left-10 glass-card float-animation"
+          aria-hidden="true"
         >
           <Camera className="w-8 h-8 m-6 text-yellow-500" />
         </motion.div>
@@ -119,6 +290,7 @@ const HeroCarousel = ({ autoSlideInterval = 5000 }) => {
           }}
           transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
           className="absolute w-16 h-16 top-40 right-20 glass-card float-animation"
+          aria-hidden="true"
         >
           <Sparkles className="w-6 h-6 m-5 text-yellow-500" />
         </motion.div>
@@ -131,6 +303,7 @@ const HeroCarousel = ({ autoSlideInterval = 5000 }) => {
           }}
           transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
           className="absolute w-12 h-12 bottom-40 left-20 glass-card float-animation"
+          aria-hidden="true"
         >
           <Heart className="w-5 h-5 text-yellow-500 m-3.5" />
         </motion.div>
@@ -139,42 +312,61 @@ const HeroCarousel = ({ autoSlideInterval = 5000 }) => {
       {/* Navigation Arrows */}
       <button
         onClick={goToPrevious}
-        className="absolute z-20 p-3 transition-all duration-300 transform -translate-y-1/2 rounded-full left-4 top-1/2 glass-button hover:scale-110"
+        className="absolute z-30 p-3 transition-all duration-300 transform -translate-y-1/2 rounded-full left-4 top-1/2 glass-button hover:scale-110 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
         aria-label="Previous image"
+        aria-controls="carousel-content"
       >
         <ChevronLeft className="w-6 h-6 text-white" />
       </button>
 
       <button
         onClick={goToNext}
-        className="absolute z-20 p-3 transition-all duration-300 transform -translate-y-1/2 rounded-full right-4 top-1/2 glass-button hover:scale-110"
+        className="absolute z-30 p-3 transition-all duration-300 transform -translate-y-1/2 rounded-full right-4 top-1/2 glass-button hover:scale-110 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
         aria-label="Next image"
+        aria-controls="carousel-content"
       >
         <ChevronRight className="w-6 h-6 text-white" />
       </button>
 
+      {/* Play/Pause Button */}
+      <button
+        onClick={() => {
+          setIsAutoPlaying(!isAutoPlaying);
+          setIsPaused(!isAutoPlaying);
+        }}
+        className="absolute z-30 p-3 transition-all duration-300 transform rounded-full top-4 right-4 glass-button hover:scale-110 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+        aria-label={isAutoPlaying ? "Pause carousel" : "Play carousel"}
+        aria-pressed={isAutoPlaying}
+      >
+        {isAutoPlaying ? (
+          <Pause className="w-5 h-5 text-white" />
+        ) : (
+          <Play className="w-5 h-5 text-white" />
+        )}
+      </button>
+
       {/* Content */}
-      <div className="relative z-20 container-custom">
+      <div id="carousel-content" className="relative z-20 container-custom px-4 md:px-6">
         <motion.div
           key={currentIndex}
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
           className="max-w-4xl mx-auto md:mx-0 text-left"
         >
-          {/* Text container aligned to gradient side */}
+          {/* Text container with enhanced glassmorphism */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-            className="p-8 md:p-12 mb-8 bg-black/20 backdrop-blur-md border border-white/10 rounded-2xl max-w-2xl"
+            transition={{ delay: 0.2, duration: 0.8, ease: "easeOut" }}
+            className="p-8 md:p-12 mb-8 bg-black/30 backdrop-blur-xl border border-white/20 rounded-2xl max-w-2xl shadow-2xl"
           >
             {/* Main Heading */}
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.6 }}
-              className="mb-6 minimal-heading glass-text"
+              transition={{ delay: 0.4, duration: 0.6, ease: "easeOut" }}
+              className="mb-6 minimal-heading glass-text text-4xl md:text-5xl lg:text-6xl"
             >
               JV Envision Photography
             </motion.h1>
@@ -183,38 +375,38 @@ const HeroCarousel = ({ autoSlideInterval = 5000 }) => {
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7, duration: 0.6 }}
-              className="mb-4 font-serif text-3xl font-semibold md:text-4xl text-white"
+              transition={{ delay: 0.6, duration: 0.6, ease: "easeOut" }}
+              className="mb-4 font-serif text-3xl font-semibold md:text-4xl lg:text-5xl text-white leading-tight"
             >
-              {images[currentIndex].title}
+              {currentImage?.title || 'Professional Photography'}
             </motion.h2>
 
             {/* Dynamic Subtitle */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.9, duration: 0.6 }}
-              className="mb-8 text-lg text-gray-200"
+              transition={{ delay: 0.8, duration: 0.6, ease: "easeOut" }}
+              className="mb-8 text-lg md:text-xl text-gray-200 leading-relaxed"
             >
-              {images[currentIndex].subtitle}
+              {currentImage?.subtitle || 'Capturing your precious moments'}
             </motion.p>
 
             {/* CTA Buttons */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.1, duration: 0.6 }}
-              className="flex flex-col items-center justify-center gap-4 mt-12 sm:flex-row"
+              transition={{ delay: 1.0, duration: 0.6, ease: "easeOut" }}
+              className="flex flex-col items-start gap-4 mt-12 sm:flex-row"
             >
               <Link
                 to="/contact"
-                className="px-8 py-4 text-lg font-semibold transition-all duration-300 rounded-lg btn-primary hover:scale-105"
+                className="px-8 py-4 text-lg font-semibold transition-all duration-300 rounded-lg btn-primary hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
               >
                 Book Session
               </Link>
               <Link
                 to="/portfolio"
-                className="px-8 py-4 text-lg font-semibold transition-all duration-300 rounded-lg btn-secondary hover:scale-105"
+                className="px-8 py-4 text-lg font-semibold transition-all duration-300 rounded-lg btn-secondary hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
               >
                 View Work
               </Link>
@@ -225,8 +417,10 @@ const HeroCarousel = ({ autoSlideInterval = 5000 }) => {
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.3, duration: 0.6 }}
-            className="grid grid-cols-2 gap-6 mt-16 md:grid-cols-4"
+            transition={{ delay: 1.2, duration: 0.6, ease: "easeOut" }}
+            className="grid grid-cols-2 gap-4 md:gap-6 mt-12 md:mt-16 md:grid-cols-4"
+            role="group"
+            aria-label="Photography statistics"
           >
             {[
               { number: '200+', label: 'Weddings' },
@@ -238,8 +432,8 @@ const HeroCarousel = ({ autoSlideInterval = 5000 }) => {
                 key={index}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 1.5 + index * 0.1, duration: 0.5 }}
-                className="p-6 text-center glass-card"
+                transition={{ delay: 1.4 + index * 0.1, duration: 0.5, ease: "easeOut" }}
+                className="p-6 text-center glass-card hover:scale-105 transition-transform duration-300"
               >
                 <div className="mb-2 font-serif text-2xl font-bold text-white md:text-3xl">
                   {stat.number}
@@ -251,39 +445,41 @@ const HeroCarousel = ({ autoSlideInterval = 5000 }) => {
         </motion.div>
       </div>
 
-      {/* Debug overlay removed after verification */}
-
-      {/* Slide Indicators */}
-      <div className="absolute z-20 transform -translate-x-1/2 bottom-8 left-1/2">
+      {/* Slide Indicators - Fixed positioning */}
+      <div className="absolute z-30 transform -translate-x-1/2 bottom-8 left-1/2" role="tablist" aria-label="Carousel slides">
         <div className="flex space-x-3">
-          {images.map((_, index) => (
+          {validImages.map((_, index) => (
             <button
               key={index}
               onClick={() => goToSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
+              role="tab"
+              aria-selected={index === currentIndex}
+              aria-controls={`slide-${index}`}
+              className={`w-3 h-3 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 ${
                 index === currentIndex
-                  ? 'bg-yellow-500 scale-125'
-                  : 'bg-white bg-opacity-50 hover:bg-opacity-75'
+                  ? 'bg-yellow-500 scale-125 w-8'
+                  : 'bg-white bg-opacity-50 hover:bg-opacity-75 hover:scale-110'
               }`}
-              aria-label={`Go to slide ${index + 1}`}
+              aria-label={`Go to slide ${index + 1} of ${validImages.length}`}
             />
           ))}
         </div>
       </div>
 
-      {/* Scroll Indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2.0, duration: 0.6 }}
-        className="absolute z-20 transform -translate-x-1/2 bottom-8 left-1/2"
-      >
+      {/* Progress Bar */}
+      {isAutoPlaying && !isPaused && (
         <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="w-px h-12 bg-white bg-opacity-50"
+          className="absolute z-30 bottom-0 left-0 right-0 h-1 bg-yellow-500/30"
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{
+            duration: autoSlideInterval / 1000,
+            ease: "linear",
+            repeat: Infinity
+          }}
+          style={{ transformOrigin: 'left' }}
         />
-      </motion.div>
+      )}
     </section>
   );
 };
