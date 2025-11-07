@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
 import { Send, Phone, Mail, MapPin, Instagram, Facebook } from 'lucide-react';
 
 const ContactForm = () => {
@@ -94,7 +94,7 @@ const ContactForm = () => {
             Get In Touch
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Ready to capture your special moments? Let's discuss your photography needs 
+            Ready to capture your special moments? Let's discuss your photography needs
             and create something beautiful together.
           </p>
         </motion.div>
@@ -108,7 +108,7 @@ const ContactForm = () => {
             className="bg-white rounded-lg shadow-lg p-8"
           >
             <h3 className="text-2xl font-serif font-semibold mb-6">Send a Message</h3>
-            
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -268,7 +268,7 @@ const ContactForm = () => {
             <div className="bg-gold/10 rounded-lg p-6">
               <h4 className="font-serif font-semibold text-lg mb-3">Quick Response</h4>
               <p className="text-gray-600 mb-4">
-                I typically respond to inquiries within 24 hours. For urgent requests, 
+                I typically respond to inquiries within 24 hours. For urgent requests,
                 please call or text directly.
               </p>
               <a
@@ -289,5 +289,3 @@ const ContactForm = () => {
 };
 
 export default ContactForm;
-
-
