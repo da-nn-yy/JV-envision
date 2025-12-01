@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
-import { Camera, Sparkles, Heart, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 import { heroCarouselData, carouselConfig } from '../data/heroCarousel';
 
 /**
@@ -23,9 +23,7 @@ const HeroCarousel = ({
   images = heroCarouselData,
   autoSlideInterval = carouselConfig.autoSlideInterval
 }) => {
-  // Validate and ensure images array is not empty
-  const validImages = Array.isArray(images) && images.length > 0 ? images : heroCarouselData;
-
+  const [fetchedImages, setFetchedImages] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
@@ -38,6 +36,36 @@ const HeroCarousel = ({
 
   // Minimum swipe distance (in px)
   const minSwipeDistance = 50;
+
+  // Fetch images from API
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+        const response = await fetch(`${API_BASE_URL}/api/hero-images?section=hero`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data && data.length > 0) {
+            const formattedImages = data.map(img => ({
+              image: img.image,
+              title: img.title,
+              subtitle: img.subtitle,
+              alt: img.title
+            }));
+            setFetchedImages(formattedImages);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch hero images:', error);
+      }
+    };
+    fetchImages();
+  }, []);
+
+  // Determine valid images: prefer fetched, then props, then default data
+  const validImages = fetchedImages.length > 0
+    ? fetchedImages
+    : (Array.isArray(images) && images.length > 0 ? images : heroCarouselData);
 
   // Ensure currentIndex is within bounds
   useEffect(() => {
@@ -52,12 +80,16 @@ const HeroCarousel = ({
       validImages.forEach((item, index) => {
         if (item?.image) {
           const img = new Image();
-          img.src = typeof item.image === 'string' ? item.image : item.image.src || item.image;
+          // Handle both URL strings and imported image objects
+          const imageUrl = typeof item.image === 'string'
+            ? item.image
+            : (item.image?.src || item.image);
+          img.src = imageUrl;
           img.onload = () => {
             setLoadedImages(prev => new Set([...prev, index]));
           };
           img.onerror = () => {
-            console.warn(`Failed to load image at index ${index}`);
+            console.warn(`Failed to load image at index ${index}: ${imageUrl}`);
           };
         }
       });
@@ -203,7 +235,10 @@ const HeroCarousel = ({
 
   // Get current image data safely
   const currentImage = validImages[currentIndex] || validImages[0];
-  const imageSrc = currentImage?.image?.src || currentImage?.image || '';
+  // Handle both imported images (objects with src) and URL strings
+  const imageSrc = typeof currentImage?.image === 'string'
+    ? currentImage.image
+    : currentImage?.image?.src || currentImage?.image || '';
 
   // Cleanup on unmount
   useEffect(() => {
@@ -217,7 +252,7 @@ const HeroCarousel = ({
   return (
     <section
       ref={carouselRef}
-      className="relative flex items-center justify-start min-h-screen overflow-hidden"
+      className="relative flex items-end justify-start h-screen overflow-hidden"
       role="region"
       aria-label="Hero carousel"
       aria-roledescription="carousel"
@@ -248,93 +283,45 @@ const HeroCarousel = ({
               alt={currentImage?.alt || `Hero image ${currentIndex + 1}`}
               decoding="async"
               loading={currentIndex === 0 ? "eager" : "lazy"}
-              className="absolute inset-0 z-0 w-full h-full object-cover"
+              className="absolute inset-0 z-0 object-cover w-full h-full"
               style={{
                 filter: loadedImages.has(currentIndex) ? 'none' : 'blur(10px)',
                 transition: 'filter 0.3s ease-in-out'
               }}
             />
-            {/* Enhanced gradient overlay */}
-            <div className="absolute inset-0 z-10 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
-            {/* Subtle vignette effect */}
-            <div
-              className="absolute inset-0 z-10"
-              style={{
-                background: 'radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.2) 100%)'
-              }}
-            ></div>
+            {/* Dark gradient overlay - hianime style */}
+            <div className="absolute inset-0 z-10 bg-gradient-to-r from-black/90 via-black/10 to-black/50"></div>
+            {/* Additional bottom gradient for text readability */}
+            <div className="absolute inset-0 z-10 bg-gradient-to-t from-black via-black/30 to-transparent"></div>
           </motion.div>
         </AnimatePresence>
       </div>
 
-      {/* Floating Decorative Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
-        <motion.div
-          animate={{
-            x: [0, 100, 0],
-            y: [0, -50, 0],
-            rotate: [0, 180, 360]
-          }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute w-20 h-20 top-20 left-10 glass-card float-animation"
-          aria-hidden="true"
-        >
-          <Camera className="w-8 h-8 m-6 text-yellow-500" />
-        </motion.div>
-
-        <motion.div
-          animate={{
-            x: [0, -80, 0],
-            y: [0, 60, 0],
-            rotate: [360, 180, 0]
-          }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="absolute w-16 h-16 top-40 right-20 glass-card float-animation"
-          aria-hidden="true"
-        >
-          <Sparkles className="w-6 h-6 m-5 text-yellow-500" />
-        </motion.div>
-
-        <motion.div
-          animate={{
-            x: [0, 60, 0],
-            y: [0, -40, 0],
-            rotate: [0, -180, -360]
-          }}
-          transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
-          className="absolute w-12 h-12 bottom-40 left-20 glass-card float-animation"
-          aria-hidden="true"
-        >
-          <Heart className="w-5 h-5 text-yellow-500 m-3.5" />
-        </motion.div>
-      </div>
-
-      {/* Navigation Arrows */}
       <button
         onClick={goToPrevious}
-        className="absolute z-30 p-3 transition-all duration-300 transform -translate-y-1/2 rounded-full left-4 top-1/2 glass-button hover:scale-110 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+        className="absolute z-30 p-4 transition-all duration-300 transform -translate-y-1/2 border rounded-full left-6 top-1/2 bg-black/40 backdrop-blur-sm border-white/20 hover:bg-black/60 hover:border-white/40 focus:outline-none focus:ring-2 focus:ring-[var(--color-gold)] focus:ring-offset-2"
         aria-label="Previous image"
         aria-controls="carousel-content"
       >
-        <ChevronLeft className="w-6 h-6 text-white" />
+        <ChevronLeft className="text-white w-7 h-7" />
       </button>
 
       <button
         onClick={goToNext}
-        className="absolute z-30 p-3 transition-all duration-300 transform -translate-y-1/2 rounded-full right-4 top-1/2 glass-button hover:scale-110 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+        className="absolute z-30 p-4 transition-all duration-300 transform -translate-y-1/2 border rounded-full right-6 top-1/2 bg-black/40 backdrop-blur-sm border-white/20 hover:bg-black/60 hover:border-white/40 focus:outline-none focus:ring-2 focus:ring-[var(--color-gold)] focus:ring-offset-2"
         aria-label="Next image"
         aria-controls="carousel-content"
       >
-        <ChevronRight className="w-6 h-6 text-white" />
+        <ChevronRight className="text-white w-7 h-7" />
       </button>
 
-      {/* Play/Pause Button */}
+      {/* Play/Pause Button - hianime style */}
       <button
         onClick={() => {
           setIsAutoPlaying(!isAutoPlaying);
           setIsPaused(!isAutoPlaying);
         }}
-        className="absolute z-30 p-3 transition-all duration-300 transform rounded-full top-4 right-4 glass-button hover:scale-110 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+        className="absolute z-30 p-3 transition-all duration-300 transform border rounded-full top-6 right-6 bg-black/40 backdrop-blur-sm border-white/20 hover:bg-black/60 hover:border-white/40 focus:outline-none focus:ring-2 focus:ring-[var(--color-gold)] focus:ring-offset-2"
         aria-label={isAutoPlaying ? "Pause carousel" : "Play carousel"}
         aria-pressed={isAutoPlaying}
       >
@@ -345,109 +332,69 @@ const HeroCarousel = ({
         )}
       </button>
 
-      {/* Content */}
-      <div id="carousel-content" className="relative z-20 container-custom px-4 md:px-6">
+      {/* Content - Bottom Left */}
+      <div id="carousel-content" className="relative z-20 px-4 pb-16 md:pb-20 lg:pb-24 container-custom md:px-6 lg:px-8">
         <motion.div
           key={currentIndex}
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="max-w-4xl mx-auto md:mx-0 text-left"
+          className="max-w-5xl text-left"
         >
-          {/* Text container with enhanced glassmorphism */}
+          {/* Main Content - Clean, no heavy glassmorphism */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.8, ease: "easeOut" }}
-            className="p-8 md:p-12 mb-8 bg-black/30 backdrop-blur-xl border border-white/20 rounded-2xl max-w-2xl shadow-2xl"
+            className="max-w-3xl"
           >
-            {/* Main Heading */}
+            {/* Dynamic Title - Large and bold */}
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.6, ease: "easeOut" }}
-              className="mb-6 minimal-heading glass-text text-4xl md:text-5xl lg:text-6xl"
-            >
-              JV Envision Photography
-            </motion.h1>
-
-            {/* Dynamic Title */}
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.6, ease: "easeOut" }}
-              className="mb-4 font-serif text-3xl font-semibold md:text-4xl lg:text-5xl text-white leading-tight"
+              transition={{ delay: 0.3, duration: 0.6, ease: "easeOut" }}
+              className="mb-6 font-serif relative right-1/2 text-4xl font-bold leading-tight text-white md:text-5xl lg:text-7xl drop-shadow-2xl"
             >
               {currentImage?.title || 'Professional Photography'}
-            </motion.h2>
+            </motion.h1>
 
             {/* Dynamic Subtitle */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8, duration: 0.6, ease: "easeOut" }}
-              className="mb-8 text-lg md:text-xl text-gray-200 leading-relaxed"
+              transition={{ delay: 0.5, duration: 0.6, ease: "easeOut" }}
+              className="max-w-2xl mb-10   relative right-1/2 text-lg leading-relaxed text-gray-300 md:text-xl lg:text-2xl drop-shadow-lg"
             >
-              {currentImage?.subtitle || 'Capturing your precious moments'}
+              {currentImage?.subtitle || 'Capturing your precious moments with artistic vision and professional excellence'}
             </motion.p>
 
-            {/* CTA Buttons */}
+            {/* CTA Buttons - More prominent */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.0, duration: 0.6, ease: "easeOut" }}
-              className="flex flex-col items-start gap-4 mt-12 sm:flex-row"
+              transition={{ delay: 0.7, duration: 0.6, ease: "easeOut" }}
+              className="flex flex-col  relative right-1/2 items-start gap-4 sm:flex-row"
             >
               <Link
                 to="/contact"
-                className="px-8 py-4 text-lg font-semibold transition-all duration-300 rounded-lg btn-primary hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+                className="px-10 py-5 text-lg font-bold text-white transition-all duration-300 rounded-lg shadow-xl bg-[var(--color-gold)] hover:bg-[var(--color-gold-dark)] hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[var(--color-gold)] focus:ring-offset-2"
               >
                 Book Session
               </Link>
               <Link
                 to="/portfolio"
-                className="px-8 py-4 text-lg font-semibold transition-all duration-300 rounded-lg btn-secondary hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+                className="px-10 py-5 text-lg font-semibold text-white transition-all duration-300 border-2 rounded-lg bg-white/10 backdrop-blur-sm border-white/30 hover:bg-white/20 hover:border-white/50 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
               >
                 View Work
               </Link>
             </motion.div>
           </motion.div>
-
-          {/* Stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.2, duration: 0.6, ease: "easeOut" }}
-            className="grid grid-cols-2 gap-4 md:gap-6 mt-12 md:mt-16 md:grid-cols-4"
-            role="group"
-            aria-label="Photography statistics"
-          >
-            {[
-              { number: '200+', label: 'Weddings' },
-              { number: '500+', label: 'Happy Clients' },
-              { number: '5', label: 'Years Experience' },
-              { number: '1000+', label: 'Photos Delivered' }
-            ].map((stat, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 1.4 + index * 0.1, duration: 0.5, ease: "easeOut" }}
-                className="p-6 text-center glass-card hover:scale-105 transition-transform duration-300"
-              >
-                <div className="mb-2 font-serif text-2xl font-bold text-white md:text-3xl">
-                  {stat.number}
-                </div>
-                <div className="text-sm font-medium text-gray-200">{stat.label}</div>
-              </motion.div>
-            ))}
-          </motion.div>
         </motion.div>
       </div>
 
-      {/* Slide Indicators - Fixed positioning */}
-      <div className="absolute z-30 transform -translate-x-1/2 bottom-8 left-1/2" role="tablist" aria-label="Carousel slides">
-        <div className="flex space-x-3">
+      {/* Slide Indicators - hianime style */}
+      <div className="absolute z-30 transform -translate-x-1/2 bottom-12 left-1/2" role="tablist" aria-label="Carousel slides">
+        <div className="flex items-center gap-2 px-4 py-2 border rounded-full bg-black/40 backdrop-blur-sm border-white/20">
           {validImages.map((_, index) => (
             <button
               key={index}
@@ -455,10 +402,10 @@ const HeroCarousel = ({
               role="tab"
               aria-selected={index === currentIndex}
               aria-controls={`slide-${index}`}
-              className={`w-3 h-3 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 ${
+              className={`rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[var(--color-gold)] focus:ring-offset-2 ${
                 index === currentIndex
-                  ? 'bg-yellow-500 scale-125 w-8'
-                  : 'bg-white bg-opacity-50 hover:bg-opacity-75 hover:scale-110'
+                  ? 'w-10 h-2 bg-[var(--color-gold)]'
+                  : 'w-2 h-2 bg-white/50 hover:bg-white/75 hover:scale-125'
               }`}
               aria-label={`Go to slide ${index + 1} of ${validImages.length}`}
             />
@@ -466,10 +413,10 @@ const HeroCarousel = ({
         </div>
       </div>
 
-      {/* Progress Bar */}
+      {/* Progress Bar - hianime style */}
       {isAutoPlaying && !isPaused && (
         <motion.div
-          className="absolute z-30 bottom-0 left-0 right-0 h-1 bg-yellow-500/30"
+          className="absolute bottom-0 left-0 right-0 z-30 h-1 bg-[var(--color-gold)]"
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
           transition={{

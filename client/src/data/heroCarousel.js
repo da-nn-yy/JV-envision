@@ -8,12 +8,11 @@
  */
 
 // Local hero images - optimized imports
-import img1 from '../assets/461536396_939926458181536_7671039877354462553_n.jpg';
-import img2 from '../assets/461604277_939926484848200_7841378582899541348_n.jpg';
-import img3 from '../assets/461724997_939926404848208_1948535839748304294_n.jpg';
-import img4 from '../assets/461768881_939926504848198_1174208919682756014_n.jpg';
-import img5 from '../assets/461774174_939926364848212_5235190980017089231_n.jpg';
-import img6 from '../assets/462125915_988534479951844_4076670015032483735_n.jpg';
+import img1 from '../assets/Screenshot 2025-11-11 225649.png';
+import img2 from '../assets/Screenshot 2025-11-11 225709.png';
+import img3 from '../assets/Screenshot 2025-11-11 225728.png';
+import img4 from '../assets/Screenshot 2025-11-11 225745.png';
+import img5 from '../assets/Screenshot 2025-11-11 225758.png';
 
 /**
  * Hero carousel data for JV Envision Photography
@@ -66,14 +65,6 @@ export const heroCarouselData = [
     subtitle: 'The beauty of new life and love',
     alt: 'Maternity photography session capturing the beauty of pregnancy',
     description: 'Capture the beautiful journey of pregnancy with our intimate maternity photography sessions that celebrate the miracle of new life.'
-  },
-  {
-    id: 6,
-    image: img6,
-    title: 'Event Photography',
-    subtitle: 'Documenting life\'s celebrations',
-    alt: 'Event and celebration photography by JV Envision Photography',
-    description: 'Professional event photography services to document your special celebrations, from corporate events to milestone parties.'
   }
 ];
 
