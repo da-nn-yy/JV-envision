@@ -45,20 +45,19 @@ const ensureSchema = async (dbPool) => {
   `);
 
   await dbPool.execute(`
-    CREATE TABLE IF NOT EXISTS gallery_images (
+    CREATE TABLE IF NOT EXISTS site_images (
       id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-      title VARCHAR(255) NOT NULL,
-      description TEXT,
-      image_url VARCHAR(500) NOT NULL,
-      image_path VARCHAR(500),
-      category ENUM('weddings', 'portraits', 'events', 'nature', 'hero', 'instagram', 'other') DEFAULT 'other',
+      url VARCHAR(255) NOT NULL,
+      title VARCHAR(100) DEFAULT NULL,
+      subtitle VARCHAR(255) DEFAULT NULL,
+      description TEXT DEFAULT NULL,
+      section ENUM('hero', 'gallery', 'about', 'services', 'portfolio') DEFAULT 'gallery',
+      category VARCHAR(50) DEFAULT NULL,
+      active BOOLEAN DEFAULT TRUE,
       display_order INT DEFAULT 0,
-      is_active BOOLEAN DEFAULT TRUE,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      INDEX idx_gallery_category (category),
-      INDEX idx_gallery_active (is_active),
-      INDEX idx_gallery_order (display_order)
+      INDEX idx_section (section),
+      INDEX idx_category (category)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
   `);
 };
