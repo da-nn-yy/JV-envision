@@ -102,3 +102,7 @@ Thumbs.db
 # Production builds
 *.tar.gz
 *.zip
+
+# Uploaded files
+server/uploads/
+uploads/
