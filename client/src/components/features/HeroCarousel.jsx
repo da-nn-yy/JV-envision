@@ -23,7 +23,6 @@ const HeroCarousel = ({
   images = heroCarouselData,
   autoSlideInterval = carouselConfig.autoSlideInterval
 }) => {
-  const [fetchedImages, setFetchedImages] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
@@ -37,35 +36,8 @@ const HeroCarousel = ({
   // Minimum swipe distance (in px)
   const minSwipeDistance = 50;
 
-  // Fetch images from API
-  useEffect(() => {
-    const fetchImages = async () => {
-      try {
-        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
-        const response = await fetch(`${API_BASE_URL}/api/hero-images?section=hero`);
-        if (response.ok) {
-          const data = await response.json();
-          if (data && data.length > 0) {
-            const formattedImages = data.map(img => ({
-              image: img.image,
-              title: img.title,
-              subtitle: img.subtitle,
-              alt: img.title
-            }));
-            setFetchedImages(formattedImages);
-          }
-        }
-      } catch (error) {
-        console.error('Failed to fetch hero images:', error);
-      }
-    };
-    fetchImages();
-  }, []);
-
-  // Determine valid images: prefer fetched, then props, then default data
-  const validImages = fetchedImages.length > 0
-    ? fetchedImages
-    : (Array.isArray(images) && images.length > 0 ? images : heroCarouselData);
+  // Determine valid images: prefer props, then default data
+  const validImages = Array.isArray(images) && images.length > 0 ? images : heroCarouselData;
 
   // Ensure currentIndex is within bounds
   useEffect(() => {

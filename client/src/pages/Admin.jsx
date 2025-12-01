@@ -25,7 +25,8 @@ const Admin = () => {
     { id: 'gallery', name: 'Gallery' },
     { id: 'about', name: 'About Page' },
     { id: 'services', name: 'Services' },
-    { id: 'portfolio', name: 'Portfolio' }
+    { id: 'portfolio', name: 'Portfolio' },
+    { id: 'instagram', name: 'Instagram Feed' }
   ];
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
@@ -180,13 +181,16 @@ const Admin = () => {
                     alt={image.title || 'Site image'}
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <div className="absolute top-2 right-2 z-10">
                     <button
-                      onClick={() => handleDelete(image.id)}
-                      className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(image.id);
+                      }}
+                      className="p-2 bg-white/90 text-red-600 rounded-full hover:bg-red-600 hover:text-white transition-all shadow-sm"
                       title="Delete Image"
                     >
-                      <Trash2 size={20} />
+                      <Trash2 size={18} />
                     </button>
                   </div>
                   <div className="absolute top-2 left-2">

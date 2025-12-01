@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
 import HeroCarousel from '../components/features/HeroCarousel';
@@ -8,6 +9,25 @@ import { instagramData } from '../data/instagram';
 import { Camera, Instagram, Heart, Award, Users, Clock, Star } from 'lucide-react';
 
 const Home = () => {
+  const [recentWorkImages, setRecentWorkImages] = useState([]);
+
+  useEffect(() => {
+    const fetchRecentWork = async () => {
+      try {
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+        const response = await fetch(`${API_BASE_URL}/api/hero-images?section=instagram`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data && data.length > 0) {
+            setRecentWorkImages(data);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch recent work:', error);
+      }
+    };
+    fetchRecentWork();
+  }, []);
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -105,7 +125,7 @@ const Home = () => {
             viewport={{ once: true }}
             className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
           >
-            {instagramData.slice(0, 6).map((post, index) => (
+            {(recentWorkImages.length > 0 ? recentWorkImages : instagramData).slice(0, 6).map((post, index) => (
               <motion.div
                 key={post.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -114,17 +134,25 @@ const Home = () => {
                 viewport={{ once: true }}
                 className="overflow-hidden minimal-card"
               >
-                <img src={post.image} alt={post.caption} className="object-cover w-full h-64" />
+                <img
+                  src={post.image}
+                  alt={post.title || post.caption || 'Recent work'}
+                  className="object-cover w-full h-64"
+                />
                 <div className="p-6">
-                  <h3 className="mb-2 font-serif text-lg">{post.caption.split(' #')[0]}</h3>
+                  <h3 className="mb-2 font-serif text-lg">
+                    {(post.title || post.caption || 'Untitled').split(' #')[0]}
+                  </h3>
                   <div className="flex items-center gap-3 text-small">
                     <span className="flex items-center gap-1">
                       <Heart className="w-4 h-4" />
-                      {post.likes}
+                      {/* Random likes for demo if not real */}
+                      {post.likes || Math.floor(Math.random() * 200) + 50}
                     </span>
                     <span className="flex items-center gap-1">
                       <Instagram className="w-4 h-4" />
-                      {post.comments}
+                      {/* Random comments for demo if not real */}
+                      {post.comments || Math.floor(Math.random() * 20) + 5}
                     </span>
                   </div>
                 </div>
