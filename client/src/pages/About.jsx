@@ -1,7 +1,28 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Camera, Heart, Award, Users, Instagram, Facebook } from 'lucide-react';
 
 const About = () => {
+  const [aboutImage, setAboutImage] = useState(null);
+
+  useEffect(() => {
+    const fetchImage = async () => {
+      try {
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+        const response = await fetch(`${API_BASE_URL}/api/hero-images?section=about`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data && data.length > 0) {
+            setAboutImage(data[0].image);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch about image:', error);
+      }
+    };
+    fetchImage();
+  }, []);
+
   const achievements = [
     { icon: Award, title: 'Award Winner', description: 'Best Wedding Photographer 2023' },
     { icon: Users, title: '500+ Clients', description: 'Happy couples and families' },
@@ -44,18 +65,18 @@ const About = () => {
               </h1>
               <div className="space-y-6 text-lg text-gray-600 leading-relaxed">
                 <p>
-                  Hello! I'm JV, a passionate photographer dedicated to capturing life's most precious moments. 
-                  With over 5 years of experience in wedding and portrait photography, I've had the privilege 
+                  Hello! I'm JV, a passionate photographer dedicated to capturing life's most precious moments.
+                  With over 5 years of experience in wedding and portrait photography, I've had the privilege
                   of documenting countless love stories and family memories.
                 </p>
                 <p>
-                  My journey began with a simple love for storytelling through images. What started as a hobby 
-                  quickly became my calling, and I've been fortunate to turn my passion into a profession that 
+                  My journey began with a simple love for storytelling through images. What started as a hobby
+                  quickly became my calling, and I've been fortunate to turn my passion into a profession that
                   brings joy to others.
                 </p>
                 <p>
-                  I believe that every moment has a story worth telling, and my mission is to preserve these 
-                  stories in the most beautiful way possible. Whether it's your wedding day, a family portrait 
+                  I believe that every moment has a story worth telling, and my mission is to preserve these
+                  stories in the most beautiful way possible. Whether it's your wedding day, a family portrait
                   session, or a special event, I'm here to capture the authentic emotions and create lasting memories.
                 </p>
               </div>
@@ -69,7 +90,7 @@ const About = () => {
             >
               <div className="relative overflow-hidden rounded-lg shadow-2xl">
                 <img
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=800&fit=crop"
+                  src={aboutImage || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=800&fit=crop"}
                   alt="JV - Photographer"
                   className="w-full h-auto object-cover"
                 />
@@ -176,15 +197,15 @@ const About = () => {
               </h2>
               <div className="space-y-6 text-lg text-gray-300 leading-relaxed">
                 <p>
-                  Photography is more than just taking pictures – it's about preserving moments that matter. 
+                  Photography is more than just taking pictures – it's about preserving moments that matter.
                   I approach each session with the understanding that these images will be treasured for years to come.
                 </p>
                 <p>
-                  My style is a blend of photojournalistic storytelling and artistic portraiture. I capture both 
+                  My style is a blend of photojournalistic storytelling and artistic portraiture. I capture both
                   the big moments and the small details, creating a comprehensive narrative of your special day or session.
                 </p>
                 <p>
-                  I believe in being unobtrusive yet present, allowing natural moments to unfold while gently 
+                  I believe in being unobtrusive yet present, allowing natural moments to unfold while gently
                   guiding when needed. The result is a collection of authentic, beautiful images that truly represent you.
                 </p>
               </div>
@@ -263,6 +284,3 @@ const About = () => {
 };
 
 export default About;
-
-
-

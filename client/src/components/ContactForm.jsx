@@ -3,10 +3,14 @@ import { motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
 import { Send, Phone, Mail, MapPin, Instagram, Facebook } from 'lucide-react';
 
 const ContactForm = () => {
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
+    serviceType: 'wedding',
+    preferredDate: '',
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,24 +28,45 @@ const ContactForm = () => {
     setIsSubmitting(true);
 
     try {
-      // Simulate API call - replace with actual endpoint
-      const response = await fetch('/api/contact', {
+      const response = await fetch(`${API_BASE_URL}/api/contact`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          preferredDate: formData.preferredDate || null
+        })
       });
 
-      if (response.ok) {
-        setSubmitStatus('success');
-        setFormData({ name: '', email: '', phone: '', message: '' });
-      } else {
-        setSubmitStatus('error');
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => null);
+        const message =
+          errorBody?.message ||
+          'Sorry, there was an error sending your message. Please try again or contact me directly.';
+        setSubmitStatus({ type: 'error', message });
+        return;
       }
+
+      setSubmitStatus({
+        type: 'success',
+        message: 'Thank you! Your message has been sent successfully. I\'ll get back to you soon.'
+      });
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        serviceType: 'wedding',
+        preferredDate: '',
+        message: ''
+      });
+
     } catch (error) {
       console.error('Error submitting form:', error);
-      setSubmitStatus('error');
+      setSubmitStatus({
+        type: 'error',
+        message: 'Sorry, there was an error sending your message. Please try again or contact me directly.'
+      });
     } finally {
       setIsSubmitting(false);
       setTimeout(() => setSubmitStatus(null), 5000);
@@ -52,19 +77,19 @@ const ContactForm = () => {
     {
       icon: Phone,
       label: 'Phone',
-      value: '(555) 123-4567',
-      href: 'tel:+15551234567'
+      value: '+1 443-538-0867',
+      href: 'tel:+14435380867'
     },
     {
       icon: Mail,
       label: 'Email',
-      value: 'hello@jvenvision.com',
-      href: 'mailto:hello@jvenvision.com'
+      value: 'envision.JVphotography@gmail.com',
+      href: 'mailto:envision.JVphotography@gmail.com'
     },
     {
       icon: MapPin,
       label: 'Location',
-      value: 'Creative City, CC 12345',
+      value: 'DC, Virginia, Columbia, Maryland 21046',
       href: null
     }
   ];
@@ -72,7 +97,7 @@ const ContactForm = () => {
   const socialLinks = [
     {
       icon: Instagram,
-      href: 'https://instagram.com/jvenvision',
+      href: 'https://instagram.com/jv.envision_photography',
       label: 'Instagram'
     },
     {
@@ -143,6 +168,39 @@ const ContactForm = () => {
                 </div>
               </div>
 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="serviceType" className="block text-sm font-medium text-gray-700 mb-2">
+                    Service Type
+                  </label>
+                  <select
+                    id="serviceType"
+                    name="serviceType"
+                    value={formData.serviceType}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent transition-colors bg-white"
+                  >
+                    <option value="wedding">Wedding</option>
+                    <option value="portrait">Portrait</option>
+                    <option value="event">Event</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="preferredDate" className="block text-sm font-medium text-gray-700 mb-2">
+                    Preferred Date
+                  </label>
+                  <input
+                    type="date"
+                    id="preferredDate"
+                    name="preferredDate"
+                    value={formData.preferredDate}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent transition-colors"
+                  />
+                </div>
+              </div>
+
               <div>
                 <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
                   Phone Number
@@ -187,23 +245,23 @@ const ContactForm = () => {
                 <span>{isSubmitting ? 'Sending...' : 'Send Message'}</span>
               </button>
 
-              {submitStatus === 'success' && (
+              {submitStatus?.type === 'success' && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg"
                 >
-                  Thank you! Your message has been sent successfully. I'll get back to you soon.
+                  {submitStatus.message}
                 </motion.div>
               )}
 
-              {submitStatus === 'error' && (
+              {submitStatus?.type === 'error' && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg"
                 >
-                  Sorry, there was an error sending your message. Please try again or contact me directly.
+                  {submitStatus.message}
                 </motion.div>
               )}
             </form>
@@ -272,7 +330,7 @@ const ContactForm = () => {
                 please call or text directly.
               </p>
               <a
-                href="https://wa.me/15551234567"
+                href="https://wa.me/14435380867"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center space-x-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"

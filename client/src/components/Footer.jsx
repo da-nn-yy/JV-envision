@@ -5,9 +5,9 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   const socialLinks = [
-    { name: 'Instagram', icon: Instagram, href: 'https://instagram.com/jvenvision' },
+    { name: 'Instagram', icon: Instagram, href: 'https://instagram.com/jv.envision_photography' },
     { name: 'Facebook', icon: Facebook, href: 'https://facebook.com/jvenvision' },
-    { name: 'Email', icon: Mail, href: 'mailto:hello@jvenvision.com' }
+    { name: 'Email', icon: Mail, href: 'mailto:envision.JVphotography@gmail.com' }
   ];
 
   const quickLinks = [
@@ -72,17 +72,17 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
                 <Phone size={16} className="text-gray-600" />
-                <span className="text-small">(555) 123-4567</span>
+                <span className="text-small">+1 443-538-0867</span>
               </div>
               <div className="flex items-center space-x-3">
                 <Mail size={16} className="text-gray-600" />
-                <span className="text-small">hello@jvenvision.com</span>
+                <span className="text-small">envision.JVphotography@gmail.com</span>
               </div>
               <div className="flex items-start space-x-3">
                 <MapPin size={16} className="text-gray-600 mt-1" />
                 <span className="text-small">
-                  123 Photography Lane<br />
-                  Creative City, CC 12345
+                  DC, Virginia, Columbia,<br />
+                  Maryland 21046
                 </span>
               </div>
             </div>

@@ -54,7 +54,7 @@ const Gallery = ({ images, categories, selectedCategory, onCategoryChange }) => 
         {/* Gallery Grid */}
         <motion.div
           layout
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3"
         >
           <AnimatePresence mode="wait">
             {filteredImages.map((image, index) => (
@@ -65,19 +65,19 @@ const Gallery = ({ images, categories, selectedCategory, onCategoryChange }) => 
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
                 transition={{ duration: 0.4 }}
-                className="glass-card cursor-pointer overflow-hidden hover:scale-105 transition-all duration-300"
+                className="overflow-hidden transition-all duration-300 cursor-pointer glass-card hover:scale-105"
                 onClick={() => openLightbox(image, index)}
               >
                 <div className="relative overflow-hidden">
                   <img
                     src={image.image}
                     alt={image.title}
-                    className="w-full h-80 object-cover"
+                    className="object-cover w-full h-80"
                     loading="lazy"
                   />
                 </div>
                 <div className="p-6">
-                  <h3 className="font-serif text-lg mb-2">{image.title}</h3>
+                  <h3 className="mb-2 font-serif text-lg">{image.title}</h3>
                   <p className="text-small">{image.description}</p>
                 </div>
               </motion.div>
@@ -92,7 +92,7 @@ const Gallery = ({ images, categories, selectedCategory, onCategoryChange }) => 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90"
               onClick={closeLightbox}
             >
               <motion.div
@@ -105,7 +105,7 @@ const Gallery = ({ images, categories, selectedCategory, onCategoryChange }) => 
                 {/* Close Button */}
                 <button
                   onClick={closeLightbox}
-                  className="absolute -top-12 right-0 text-white hover:text-gold transition-colors z-10"
+                  className="absolute right-0 z-10 text-white transition-colors -top-12 hover:text-gold"
                 >
                   <X size={32} />
                 </button>
@@ -115,13 +115,13 @@ const Gallery = ({ images, categories, selectedCategory, onCategoryChange }) => 
                   <>
                     <button
                       onClick={prevImage}
-                      className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gold transition-colors z-10"
+                      className="absolute z-10 text-white transition-colors transform -translate-y-1/2 left-4 top-1/2 hover:text-gold"
                     >
                       <ChevronLeft size={32} />
                     </button>
                     <button
                       onClick={nextImage}
-                      className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gold transition-colors z-10"
+                      className="absolute z-10 text-white transition-colors transform -translate-y-1/2 right-4 top-1/2 hover:text-gold"
                     >
                       <ChevronRight size={32} />
                     </button>
@@ -136,10 +136,10 @@ const Gallery = ({ images, categories, selectedCategory, onCategoryChange }) => 
                 />
 
                 {/* Image Info */}
-                <div className="absolute bottom-4 left-4 right-4 bg-black/70 backdrop-blur-sm rounded-lg p-4 text-white">
-                  <h3 className="font-serif font-semibold text-xl mb-2">{selectedImage.title}</h3>
+                <div className="absolute p-4 text-white rounded-lg bottom-4 left-4 right-4 bg-black/70 backdrop-blur-sm">
+                  <h3 className="mb-2 font-serif text-xl font-semibold">{selectedImage.title}</h3>
                   <p className="text-gray-200">{selectedImage.description}</p>
-                  <p className="text-sm text-gray-400 mt-2">
+                  <p className="mt-2 text-sm text-gray-400">
                     {currentIndex + 1} of {filteredImages.length}
                   </p>
                 </div>
