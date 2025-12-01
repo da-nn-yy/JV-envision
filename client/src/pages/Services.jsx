@@ -75,7 +75,7 @@ const Services = () => {
 
                   <Link
                     to="/contact"
-                    className={`w-full text-center py-3 rounded-lg font-semibold transition-colors duration-300 ${
+                    className={`w-full text-center py-3 px-4 rounded-lg font-semibold transition-colors duration-300 ${
                       service.popular
                         ? 'bg-gold text-black hover:bg-yellow-600'
                         : 'bg-black text-white hover:bg-gray-800'

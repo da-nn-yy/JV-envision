@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import Gallery from '../components/Gallery';
+import Gallery from '../components/features/Gallery';
 import { portfolioData, categories as staticCategories } from '../data/portfolio';
 import { Camera, Filter } from 'lucide-react';
 

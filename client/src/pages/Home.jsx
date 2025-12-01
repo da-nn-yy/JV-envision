@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
-import HeroCarousel from '../components/HeroCarousel';
+import HeroCarousel from '../components/features/HeroCarousel';
 import { heroCarouselData } from '../data/heroCarousel';
-import TestimonialCard from '../components/TestimonialCard';
+import TestimonialCard from '../components/common/TestimonialCard';
 import { testimonialsData } from '../data/testimonials';
 import { instagramData } from '../data/instagram';
 import { Camera, Instagram, Heart, Award, Users, Clock, Star } from 'lucide-react';

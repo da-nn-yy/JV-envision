@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import ContactForm from '../components/ContactForm';
+import ContactForm from '../components/features/ContactForm';
 import { MapPin, Phone, Mail, Clock } from 'lucide-react';
 
 const Contact = () => {
