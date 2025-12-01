@@ -28,14 +28,6 @@ const Portfolio = () => {
               description: img.description || img.subtitle
             }));
             setImages(formattedImages);
-
-            // Extract unique categories
-            const uniqueCats = ['all', ...new Set(formattedImages.map(img => img.category).filter(Boolean))];
-            const formattedCategories = uniqueCats.map(cat => ({
-              id: cat,
-              name: cat.charAt(0).toUpperCase() + cat.slice(1)
-            }));
-            setDynamicCategories(formattedCategories);
           }
         }
       } catch (error) {
@@ -44,6 +36,15 @@ const Portfolio = () => {
     };
     fetchImages();
   }, []);
+
+  // Fixed categories as requested
+  const fixedCategories = [
+    { id: 'all', name: 'All' },
+    { id: 'wedding', name: 'Wedding' },
+    { id: 'portraits', name: 'Portraits' },
+    { id: 'events', name: 'Events' },
+    { id: 'nature', name: 'Nature' }
+  ];
 
   const handleCategoryChange = (categoryId) => {
     setSelectedCategory(categoryId);
@@ -105,7 +106,7 @@ const Portfolio = () => {
       {/* Gallery Section */}
       <Gallery
         images={images}
-        categories={dynamicCategories}
+        categories={fixedCategories}
         selectedCategory={selectedCategory}
         onCategoryChange={setSelectedCategory}
       />

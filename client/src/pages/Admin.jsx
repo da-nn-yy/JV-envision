@@ -8,7 +8,6 @@ const Admin = () => {
   const [uploading, setUploading] = useState(false);
   const [activeSection, setActiveSection] = useState('all');
   const [showUploadModal, setShowUploadModal] = useState(false);
-  const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
   const [uploadStatus, setUploadStatus] = useState(null);
 
   const [formData, setFormData] = useState({
@@ -250,36 +249,17 @@ const Admin = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
                   <select
-                    value={showNewCategoryInput ? 'new' : formData.category}
-                    onChange={(e) => {
-                      if (e.target.value === 'new') {
-                        setShowNewCategoryInput(true);
-                        setFormData(prev => ({ ...prev, category: '' }));
-                      } else {
-                        setShowNewCategoryInput(false);
-                        setFormData(prev => ({ ...prev, category: e.target.value }));
-                      }
-                    }}
+                    name="category"
+                    value={formData.category}
+                    onChange={handleInputChange}
                     className="w-full px-3 py-2 border rounded-md focus:ring-gold focus:border-gold mb-2"
                   >
                     <option value="">Select a category...</option>
-                    {Array.from(new Set(images.map(img => img.category).filter(Boolean))).map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                    <option value="new">+ Create New Category</option>
+                    <option value="wedding">Wedding</option>
+                    <option value="portraits">Portraits</option>
+                    <option value="events">Events</option>
+                    <option value="nature">Nature</option>
                   </select>
-
-                  {showNewCategoryInput && (
-                    <input
-                      type="text"
-                      name="category"
-                      value={formData.category}
-                      onChange={handleInputChange}
-                      placeholder="Enter new category name"
-                      className="w-full px-3 py-2 border rounded-md focus:ring-gold focus:border-gold"
-                      autoFocus
-                    />
-                  )}
                 </div>
 
                 <div>

@@ -8,11 +8,11 @@
  */
 
 // Local hero images - optimized imports
-import img1 from '../assets/Screenshot 2025-11-11 225649.png';
-import img2 from '../assets/Screenshot 2025-11-11 225709.png';
-import img3 from '../assets/Screenshot 2025-11-11 225728.png';
-import img4 from '../assets/Screenshot 2025-11-11 225745.png';
-import img5 from '../assets/Screenshot 2025-11-11 225758.png';
+import img1 from '../assets/hero_wedding_dance.jpg';
+import img2 from '../assets/hero_portraits_pink.png';
+import img3 from '../assets/hero_couple_bench.png';
+import img4 from '../assets/hero_event_decor.png';
+import img5 from '../assets/hero_cultural_group.jpg';
 
 /**
  * Hero carousel data for JV Envision Photography
@@ -31,40 +31,40 @@ export const heroCarouselData = [
     image: img1,
     title: 'Elegant Wedding Photography',
     subtitle: 'Capturing your special day with artistic vision',
-    alt: 'Elegant wedding moment captured by JV Envision Photography',
+    alt: 'Joyful wedding celebration captured by JV Envision Photography',
     description: 'Professional wedding photography services that capture the essence of your special day with artistic vision and attention to detail.'
   },
   {
     id: 2,
     image: img2,
-    title: 'Family Portrait Sessions',
+    title: 'Portrait Sessions',
     subtitle: 'Timeless memories for generations to come',
-    alt: 'Family portrait session outdoors by JV Envision Photography',
-    description: 'Create lasting family memories with our professional portrait sessions, designed to capture the love and connection between family members.'
+    alt: 'Professional portrait session by JV Envision Photography',
+    description: 'Create lasting memories with our professional portrait sessions, designed to capture the unique personality and connection of every subject.'
   },
   {
     id: 3,
     image: img3,
-    title: 'Destination Weddings',
-    subtitle: 'Adventure and romance captured beautifully',
-    alt: 'Destination wedding photography by JV Envision Photography',
-    description: 'Travel with us to capture your destination wedding, combining adventure and romance in stunning locations around the world.'
+    title: 'Engagement & Couples',
+    subtitle: 'Love stories captured beautifully',
+    alt: 'Romantic couple photography by JV Envision Photography',
+    description: 'Celebrate your love story with an intimate engagement or couple session, capturing the genuine connection between you and your partner.'
   },
   {
     id: 4,
     image: img4,
-    title: 'Senior Portrait Photography',
-    subtitle: 'Celebrating life\'s milestones with style',
-    alt: 'Senior portrait photography session by JV Envision Photography',
-    description: 'Celebrate your high school graduation with a professional senior portrait session that reflects your unique personality and style.'
+    title: 'Event Styling & Decor',
+    subtitle: 'The finer details that make your event unique',
+    alt: 'Beautiful event decoration details captured by JV Envision Photography',
+    description: 'We capture not just the moments, but the atmosphere and details that you worked so hard to create for your special event.'
   },
   {
     id: 5,
     image: img5,
-    title: 'Maternity Photography',
-    subtitle: 'The beauty of new life and love',
-    alt: 'Maternity photography session capturing the beauty of pregnancy',
-    description: 'Capture the beautiful journey of pregnancy with our intimate maternity photography sessions that celebrate the miracle of new life.'
+    title: 'Cultural Celebrations',
+    subtitle: 'Honoring traditions and heritage',
+    alt: 'Cultural group celebration captured by JV Envision Photography',
+    description: 'Specializing in cultural weddings and events, we understand the importance of tradition and capture every meaningful ritual with respect.'
   }
 ];
 

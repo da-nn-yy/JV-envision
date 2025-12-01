@@ -365,7 +365,7 @@ const HeroCarousel = ({
               transition={{ delay: 0.5, duration: 0.6, ease: "easeOut" }}
               className="max-w-2xl mb-10 mr-auto text-lg leading-relaxed text-gray-300 md:text-xl lg:text-2xl drop-shadow-lg"
             >
-              {currentImage?.subtitle || 'Capturing your precious moments with artistic vision and professional excellence'}
+              {currentImage?.description || currentImage?.subtitle || 'Capturing your precious moments with artistic vision and professional excellence'}
             </motion.p>
 
             {/* CTA Buttons - More prominent */}
