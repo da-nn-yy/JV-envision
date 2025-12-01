@@ -18,8 +18,8 @@ const Contact = () => {
               Contact Me
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Ready to capture your special moments? I'd love to hear from you! 
-              Whether you're planning a wedding, need family portraits, or have any photography questions, 
+              Ready to capture your special moments? I'd love to hear from you!
+              Whether you're planning a wedding, need family portraits, or have any photography questions,
               let's start the conversation.
             </p>
           </motion.div>
@@ -35,22 +35,22 @@ const Contact = () => {
               {
                 icon: Phone,
                 title: 'Call Me',
-                info: '(555) 123-4567',
+                info: '+1 443-538-0867',
                 description: 'Available Mon-Fri 9AM-6PM',
-                href: 'tel:+15551234567'
+                href: 'tel:+14435380867'
               },
               {
                 icon: Mail,
                 title: 'Email Me',
-                info: 'hello@jvenvision.com',
+                info: 'envision.JVphotography@gmail.com',
                 description: 'I respond within 24 hours',
-                href: 'mailto:hello@jvenvision.com'
+                href: 'mailto:envision.JVphotography@gmail.com'
               },
               {
                 icon: MapPin,
                 title: 'Visit Me',
-                info: 'Creative City, CC',
-                description: 'Serving the greater area',
+                info: 'DC, Virginia, Columbia',
+                description: 'Maryland 21046',
                 href: null
               },
               {
@@ -68,7 +68,7 @@ const Contact = () => {
                     <Icon className="h-8 w-8 text-black" />
                   </div>
                   <h3 className="text-lg font-serif font-semibold mb-2">{contact.title}</h3>
-                  <p className="text-gray-900 font-medium mb-1">{contact.info}</p>
+                  <p className="text-gray-900 font-medium mb-1 break-words">{contact.info}</p>
                   <p className="text-sm text-gray-600">{contact.description}</p>
                 </div>
               );
@@ -102,7 +102,7 @@ const Contact = () => {
               My Location
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Based in Creative City, I serve clients throughout the region and beyond
+              Based in Maryland, I serve clients throughout DC, Virginia, and Columbia.
             </p>
           </motion.div>
 
@@ -117,7 +117,7 @@ const Contact = () => {
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-gold rounded-full"></div>
-                  <span className="text-gray-700">Creative City & Surrounding Areas</span>
+                  <span className="text-gray-700">DC, Virginia, Columbia & Surrounding Areas</span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-gold rounded-full"></div>
@@ -136,8 +136,8 @@ const Contact = () => {
               <div className="mt-8 p-6 bg-gray-50 rounded-lg">
                 <h4 className="font-semibold text-gray-900 mb-3">Travel Information</h4>
                 <p className="text-gray-600 text-sm leading-relaxed">
-                  I love traveling for destination weddings and special events! 
-                  Travel fees are calculated based on distance and accommodation needs. 
+                  I love traveling for destination weddings and special events!
+                  Travel fees are calculated based on distance and accommodation needs.
                   Contact me for a personalized quote for your location.
                 </p>
               </div>
@@ -155,7 +155,7 @@ const Contact = () => {
                 <div className="text-center text-gray-500">
                   <MapPin className="h-16 w-16 mx-auto mb-4" />
                   <p className="text-lg font-medium">Interactive Map</p>
-                  <p className="text-sm">Creative City, CC 12345</p>
+                  <p className="text-sm">Maryland 21046</p>
                   <p className="text-xs mt-2">Map integration would go here</p>
                 </div>
               </div>
@@ -179,7 +179,7 @@ const Contact = () => {
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
               Follow my journey and see my latest work on social media
             </p>
-            
+
             <div className="flex justify-center space-x-6 mb-8">
               <a
                 href="https://instagram.com/jvenvision"
@@ -206,7 +206,7 @@ const Contact = () => {
             <div className="bg-white p-8 rounded-lg shadow-lg max-w-2xl mx-auto">
               <h3 className="text-xl font-serif font-semibold mb-4">Stay Updated</h3>
               <p className="text-gray-600 mb-6">
-                Follow me on social media to see my latest work, behind-the-scenes content, 
+                Follow me on social media to see my latest work, behind-the-scenes content,
                 and photography tips. I love connecting with clients and fellow photography enthusiasts!
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -236,6 +236,3 @@ const Contact = () => {
 };
 
 export default Contact;
-
-
-
