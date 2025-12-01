@@ -1,10 +1,12 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 // Import routes
 const contactRoutes = require('./routes/contactRoutes');
+const galleryRoutes = require('./routes/galleryRoutes');
+const { initPool, closePool } = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -25,6 +27,9 @@ app.use((req, res, next) => {
 
 // Routes
 app.use('/api/contact', contactRoutes);
+app.use('/api/gallery', galleryRoutes);
+app.use('/api/hero-images', require('./routes/images'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -55,59 +60,21 @@ app.use((error, req, res, next) => {
   });
 });
 
-// Connect to MongoDB
-const connectDB = async () => {
-  try {
-    const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/jv-envision-photography';
-
-    // For development, try to connect but don't fail if MongoDB isn't available
-    if (process.env.NODE_ENV === 'development') {
-      try {
-        await mongoose.connect(mongoURI);
-        console.log('✅ MongoDB connected successfully');
-      } catch (error) {
-        console.log('⚠️  MongoDB not available, running in development mode without database');
-        console.log('   Contact form submissions will be logged to console only');
-        return; // Continue without MongoDB
-      }
-    } else {
-      await mongoose.connect(mongoURI);
-      console.log('✅ MongoDB connected successfully');
-    }
-
-    // Handle connection events
-    mongoose.connection.on('error', (err) => {
-      console.error('MongoDB connection error:', err);
-    });
-
-    mongoose.connection.on('disconnected', () => {
-      console.log('MongoDB disconnected');
-    });
-
-    // Graceful shutdown
-    process.on('SIGINT', async () => {
-      if (mongoose.connection.readyState !== 0) {
-        await mongoose.connection.close();
-        console.log('MongoDB connection closed through app termination');
-      }
-      process.exit(0);
-    });
-
-  } catch (error) {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('⚠️  MongoDB connection failed, running in development mode');
-      console.log('   Contact form submissions will be logged to console only');
-    } else {
-      console.error('MongoDB connection failed:', error);
-      process.exit(1);
-    }
-  }
-};
-
 // Start server
 const startServer = async () => {
   try {
-    await connectDB();
+    const poolResult = await initPool();
+
+    // If poolResult is the pool object, attach it to the app
+    if (poolResult) {
+      app.set('db', poolResult);
+    }
+
+    if (!poolResult && process.env.NODE_ENV === 'development') {
+      console.log('\n⚠️  Server starting in development mode without MySQL database');
+      console.log('   Contact form submissions will be logged to console only');
+      console.log('   To enable database, configure MySQL credentials in .env file\n');
+    }
 
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
@@ -116,9 +83,30 @@ const startServer = async () => {
       console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
     });
 
+    const shutdown = async () => {
+      console.log('🔻 Shutting down server...');
+      await closePool();
+      process.exit(0);
+    };
+
+    process.on('SIGINT', shutdown);
+    process.on('SIGTERM', shutdown);
+
   } catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1);
+    // Only exit if it's a critical error in production
+    if (process.env.NODE_ENV === 'production') {
+      console.error('Failed to start server:', error.message || error);
+      process.exit(1);
+    } else {
+      // In development, try to start anyway
+      console.warn('⚠️  Database connection failed, but starting server in development mode');
+      app.listen(PORT, () => {
+        console.log(`🚀 Server running on port ${PORT} (without database)`);
+        console.log(`📱 Environment: ${process.env.NODE_ENV || 'development'}`);
+        console.log(`🌐 CORS enabled for: ${process.env.CLIENT_URL || 'http://localhost:5173'}`);
+        console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
+      });
+    }
   }
 };
 

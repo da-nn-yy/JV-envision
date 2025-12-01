@@ -1,12 +1,49 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Gallery from '../components/Gallery';
-import { portfolioData, categories } from '../data/portfolio';
+import { portfolioData, categories as staticCategories } from '../data/portfolio';
 import { Camera, Filter } from 'lucide-react';
 
 const Portfolio = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [images, setImages] = useState(portfolioData);
+  const [dynamicCategories, setDynamicCategories] = useState(staticCategories);
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+        // Fetch both gallery and portfolio sections if possible, or just gallery for now
+        const response = await fetch(`${API_BASE_URL}/api/hero-images?section=gallery`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data && data.length > 0) {
+            // Transform API data to match Gallery component structure
+            const formattedImages = data.map(img => ({
+              id: img.id,
+              image: img.image,
+              title: img.title,
+              category: img.category || 'uncategorized',
+              description: img.description || img.subtitle
+            }));
+            setImages(formattedImages);
+
+            // Extract unique categories
+            const uniqueCats = ['all', ...new Set(formattedImages.map(img => img.category).filter(Boolean))];
+            const formattedCategories = uniqueCats.map(cat => ({
+              id: cat,
+              name: cat.charAt(0).toUpperCase() + cat.slice(1)
+            }));
+            setDynamicCategories(formattedCategories);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch portfolio images:', error);
+      }
+    };
+    fetchImages();
+  }, []);
 
   const handleCategoryChange = (categoryId) => {
     setSelectedCategory(categoryId);
@@ -67,10 +104,10 @@ const Portfolio = () => {
 
       {/* Gallery Section */}
       <Gallery
-        images={portfolioData}
-        categories={categories}
+        images={images}
+        categories={dynamicCategories}
         selectedCategory={selectedCategory}
-        onCategoryChange={handleCategoryChange}
+        onCategoryChange={setSelectedCategory}
       />
 
       {/* Process Section */}

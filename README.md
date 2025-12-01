@@ -1,6 +1,6 @@
 # JV Envision Photography Website
 
-A modern, responsive photography website built with React.js, Node.js, and MongoDB. This project showcases JV Envision Photography's portfolio, services, and provides a platform for client inquiries and bookings.
+A modern, responsive photography website built with React.js, Node.js, and MySQL. This project showcases JV Envision Photography's portfolio, services, and provides a platform for client inquiries and bookings.
 
 ## 🌟 Features
 
@@ -26,8 +26,8 @@ A modern, responsive photography website built with React.js, Node.js, and Mongo
 ### Backend
 - **Node.js** - JavaScript runtime
 - **Express.js** - Web application framework
-- **MongoDB** - NoSQL database
-- **Mongoose** - MongoDB object modeling
+- **MySQL** - Relational database
+- **mysql2** - Promise-based MySQL client
 - **CORS** - Cross-origin resource sharing
 
 ## 📁 Project Structure
@@ -47,10 +47,12 @@ JV-project/
 │   ├── package.json       # Frontend dependencies
 │   └── vite.config.js     # Vite configuration
 ├── server/                 # Backend Node.js application
-│   ├── routes/            # API routes
-│   ├── models/            # Database models
-│   ├── index.js           # Server entry point
-│   └── package.json       # Backend dependencies
+│   ├── db/               # Database connection pool
+│   ├── routes/           # API routes
+│   ├── models/           # Data access layer
+│   ├── schema.sql        # Schema bootstrap script
+│   ├── index.js          # Server entry point
+│   └── package.json      # Backend dependencies
 └── README.md              # Project documentation
 ```
 
@@ -58,9 +60,9 @@ JV-project/
 
 ### Prerequisites
 
-- Node.js (v16 or higher)
-- npm or yarn
-- MongoDB Atlas account (for cloud database) or local MongoDB installation
+- Node.js (v18 or higher)
+- npm
+- MySQL 8 (local installation or managed service)
 
 ### Installation
 
@@ -86,14 +88,31 @@ JV-project/
    ```bash
    # In the server directory, create a .env file
    cp env.example .env
+   # In the client directory, create a .env file
+   cp env.example .env
    ```
-   
-   Update the `.env` file with your MongoDB connection string:
+
+   Update `server/.env` with your MySQL connection details:
    ```
-   MONGODB_URI=your_mongodb_connection_string
+   MYSQL_HOST=localhost
+   MYSQL_PORT=3306
+   MYSQL_USER=your_mysql_user
+   MYSQL_PASSWORD=your_mysql_password
+   MYSQL_DATABASE=jv_envision_photography
+   MYSQL_CONNECTION_LIMIT=10
    PORT=5000
    NODE_ENV=development
    CLIENT_URL=http://localhost:5173
+   ```
+
+   Update `client/.env` if the backend runs on a different host:
+   ```
+   VITE_API_BASE_URL=http://localhost:5000
+   ```
+
+5. **Bootstrap the database (optional)**
+   ```bash
+   mysql -u root -p < server/schema.sql
    ```
 
 ### Running the Application
@@ -175,7 +194,7 @@ theme: {
 The backend server configuration is in `server/index.js`:
 
 - CORS enabled for frontend communication
-- MongoDB connection with error handling
+- MySQL connection pool with schema bootstrap and graceful shutdown
 - Express middleware for JSON parsing
 - Global error handling
 - Health check endpoint
@@ -184,10 +203,10 @@ The backend server configuration is in `server/index.js`:
 
 ### Contact API (`/api/contact`)
 
-- **POST** `/api/contact` - Submit contact inquiry
-- **GET** `/api/contact` - Get all inquiries (admin)
+- **POST** `/api/contact` - Submit contact inquiry (persisted to MySQL)
+- **GET** `/api/contact` - Get paginated inquiries (admin)
 - **GET** `/api/contact/:id` - Get single inquiry
-- **PUT** `/api/contact/:id` - Update inquiry status
+- **PUT** `/api/contact/:id` - Update inquiry status/notes
 
 ### Health Check
 - **GET** `/api/health` - Server health status
@@ -238,7 +257,7 @@ Replace placeholder images with actual photography:
    - Set build command: `npm run build`
    - Set publish directory: `dist`
 
-### Backend Deployment (Render/Heroku)
+### Backend Deployment (Render/Fly.io/Other)
 
 1. **Prepare for production**
    ```bash
@@ -246,23 +265,24 @@ Replace placeholder images with actual photography:
    npm install --production
    ```
 
-2. **Deploy to Render**
-   - Connect GitHub repository
+2. **Provision a managed MySQL database**
+   - Create a production database (e.g. Amazon RDS, PlanetScale, Neon for MySQL, etc.)
+   - Run `server/schema.sql` to create required tables
+   - Note the connection string and credentials
+
+3. **Deploy the Node backend**
    - Set build command: `npm install`
    - Set start command: `npm start`
-   - Add environment variables
-
-3. **Deploy to Heroku**
-   ```bash
-   heroku create jv-envision-api
-   heroku config:set MONGODB_URI=your_production_mongodb_uri
-   git push heroku main
-   ```
+   - Configure environment variables with production MySQL credentials
 
 ### Environment Variables for Production
 
 ```bash
-MONGODB_URI=your_production_mongodb_uri
+MYSQL_HOST=your_mysql_host
+MYSQL_PORT=3306
+MYSQL_USER=your_mysql_user
+MYSQL_PASSWORD=your_mysql_password
+MYSQL_DATABASE=jv_envision_photography
 PORT=5000
 NODE_ENV=production
 CLIENT_URL=https://your-frontend-domain.com
@@ -288,10 +308,10 @@ CLIENT_URL=https://your-frontend-domain.com
 
 ### Common Issues
 
-1. **MongoDB Connection Error**
-   - Check connection string format
-   - Verify network access in MongoDB Atlas
-   - Ensure IP whitelist includes your server
+1. **MySQL Connection Error**
+   - Verify credentials and host in environment variables
+   - Confirm the database exists (run `server/schema.sql`)
+   - Ensure the MySQL user has permissions to access the database
 
 2. **CORS Errors**
    - Update CLIENT_URL in environment variables
@@ -331,6 +351,3 @@ For support and questions:
 ---
 
 **Built with ❤️ for JV Envision Photography**
-
-
-
