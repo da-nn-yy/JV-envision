@@ -2,13 +2,11 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Gallery from '../components/features/Gallery';
-import { portfolioData, categories as staticCategories } from '../data/portfolio';
-import { Camera, Filter } from 'lucide-react';
+import { Camera } from 'lucide-react';
 
 const Portfolio = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [images, setImages] = useState(portfolioData);
-  const [dynamicCategories, setDynamicCategories] = useState(staticCategories);
+  const [images, setImages] = useState([]);
 
   useEffect(() => {
     const fetchImages = async () => {
