@@ -14,8 +14,8 @@ const Portfolio = () => {
     const fetchImages = async () => {
       try {
         const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
-        // Fetch both gallery and portfolio sections if possible, or just gallery for now
-        const response = await fetch(`${API_BASE_URL}/api/hero-images?section=gallery`);
+        // Fetch portfolio images from the database
+        const response = await fetch(`${API_BASE_URL}/api/hero-images?section=portfolio`);
         if (response.ok) {
           const data = await response.json();
           if (data && data.length > 0) {

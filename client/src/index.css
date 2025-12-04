@@ -28,7 +28,7 @@
 }
 
 html {
-  /* scroll-behavior: smooth; - Removed to ensure instant page transitions */
+  scroll-behavior: smooth;
 }
 
 body {
@@ -152,12 +152,17 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Clean Navigation */
 .nav-link {
+  color: var(--color-primary);
   font-weight: 400;
   font-size: 0.875rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   transition: color 0.3s ease;
   position: relative;
+}
+
+.nav-link:hover {
+  color: var(--color-secondary);
 }
 
 .nav-link.active::after {
@@ -167,7 +172,7 @@ h1, h2, h3, h4, h5, h6 {
   left: 0;
   right: 0;
   height: 1px;
-  background-color: currentColor;
+  background-color: var(--color-primary);
 }
 
 /* Minimal Gallery */
