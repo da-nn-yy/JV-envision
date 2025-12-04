@@ -182,7 +182,7 @@ const Contact = () => {
 
             <div className="flex justify-center space-x-6 mb-8">
               <a
-                href="https://instagram.com/jvenvision"
+                href="https://www.instagram.com/jv.envision_photography/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group p-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105"
@@ -211,7 +211,7 @@ const Contact = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a
-                  href="https://instagram.com/jvenvision"
+                  href="https://www.instagram.com/jv.envision_photography/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-primary"

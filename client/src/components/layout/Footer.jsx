@@ -5,7 +5,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   const socialLinks = [
-    { name: 'Instagram', icon: Instagram, href: 'https://instagram.com/jv.envision_photography' },
+    { name: 'Instagram', icon: Instagram, href: 'https://www.instagram.com/jv.envision_photography/' },
     { name: 'Facebook', icon: Facebook, href: 'https://facebook.com/jvenvision' },
     { name: 'Email', icon: Mail, href: 'mailto:envision.JVphotography@gmail.com' }
   ];

@@ -260,7 +260,7 @@ const About = () => {
             </p>
             <div className="flex justify-center space-x-6">
               <a
-                href="https://instagram.com/jvenvision"
+                href="https://www.instagram.com/jv.envision_photography/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300"

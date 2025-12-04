@@ -97,7 +97,7 @@ const ContactForm = () => {
   const socialLinks = [
     {
       icon: Instagram,
-      href: 'https://instagram.com/jv.envision_photography',
+      href: 'https://www.instagram.com/jv.envision_photography/',
       label: 'Instagram'
     },
     {
